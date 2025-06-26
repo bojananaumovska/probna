@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <base href="pictures/">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Нов парк во центарот</title>
+    <style>
+        body {
+            font-family: Georgia, serif;
+            max-width: 650px;
+            margin: 2rem auto;
+            padding: 1rem 1.5rem;
+            background: #fdf8f2;
+            color: #4a3c31;
+            line-height: 1.5;
+            border: 1px solid #c8bfa6;
+            box-shadow: 0 0 10px #d6cbb3;
+            font-size: 10px;
+        }
+        header {
+            border-bottom: 2px solid #8b6d5c;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+        }
+        h1 {
+            color: #8b6d5c;
+            font-size: 1.6rem;
+            margin-bottom: 0.3rem;
+            line-height: 1.3;
+            cursor: pointer;
+        }
+        .article-meta {
+            font-size: 0.85rem;
+            color: #7d6a57;
+            margin-bottom: 1.8rem;
+            font-style: italic;
+        }
+        p {
+            margin-bottom: 1rem;
+            font-size: 0.95rem;
+        }
+        blockquote {
+            border-left: 4px solid #8b6d5c;
+            padding-left: 1rem;
+            color: #7d6a57;
+            font-style: italic;
+            margin: 1rem 0;
+            background: #f4ede7;
+            border-radius: 4px;
+            font-size: 0.95rem;
+            cursor: pointer;
+        }
+        figure {
+            margin: 1.2rem 0;
+            text-align: center;
+        }
+        figure img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 6px;
+            max-height: 280px;
+            object-fit: cover;
+            cursor: pointer;
+        }
+        figcaption {
+            font-size: 0.8rem;
+            color: #7d6a57;
+            margin-top: 0.3rem;
+            font-style: italic;
+        }
+        footer {
+            margin-top: 2.5rem;
+            border-top: 1px solid #c8bfa6;
+            padding-top: 1rem;
+            font-size: 0.85rem;
+            color: #7d6a57;
+            text-align: center;
+        }
+        a {
+            color: #a1866f;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        a:hover {
+            color: #6f563f;
+            text-decoration: underline;
+        }
+        #investigate-btn {
+            display: block;
+            margin: 2rem auto;
+            padding: 0.6rem 1.2rem;
+            font-size: 1rem;
+            background-color: #8b6d5c;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            box-shadow: 0 3px 6px rgba(139,109,92,0.5);
+            transition: background-color 0.3s ease;
+        }
+        #investigate-btn:hover {
+            background-color: #6f563f;
+        }
+        #modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0; top: 0;
+            width: 100%; height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.5);
+        }
+        #modal-content {
+            background-color: #fdf8f2;
+            margin: 10% auto;
+            padding: 1.5rem;
+            border: 1px solid #c8bfa6;
+            max-width: 450px;
+            border-radius: 8px;
+            box-shadow: 0 0 15px #d6cbb3;
+            color: #4a3c31;
+            font-size: 1rem;
+            line-height: 1.4;
+        }
+        #modal-text {
+            margin-bottom: 1.5rem;
+            white-space: pre-line;
+        }
+        #modal-buttons {
+            text-align: right;
+        }
+        button.modal-btn {
+            background-color: #8b6d5c;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            margin-left: 0.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background-color 0.3s ease;
+        }
+        button.modal-btn:hover {
+            background-color: #6f563f;
+        }
+        .help-box {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            align-items: center;
+            background: #735643;
+            padding: 5px 10px;
+            border-radius: 25px;
+            box-shadow: 0 0 8px rgba(0,0,0,0.3);
+            cursor: pointer;
+            z-index: 100;
+            gap: 8px;
+        }
+        .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            overflow: hidden;
+        }
+        .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .help-text {
+            color: #f5e1c0;
+            font-size: 12px;
+            font-weight: bold;
+            font-family: 'Georgia', serif;
+        }
+        #helpHintBox {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: rgba(115, 86, 67, 0.95);
+            color: #f5e1c0;
+            padding: 6px 12px;
+            border-radius: 10px;
+            box-shadow: 0 0 8px rgba(0,0,0,0.7);
+            font-family: 'Georgia', serif;
+            font-size: 10px;
+            font-weight: bold;
+            margin-top: 6px;
+            min-width: 150px;
+            max-width: 250px;
+            visibility: hidden;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 110;
+            user-select: none;
+        }
+        #helpHintBox.visible {
+            visibility: visible;
+            opacity: 1;
+        }
+
+    </style>
+</head>
+<body>
+
+<header>
+    <h1 style="font-size: 20px" id="title">Новиот парк во центарот на градот ќе го подобри квалитетот на воздухот и ќе ја зголеми зелената површина</h1>
+    <div class="article-meta" id="date">
+        Автор: Локален весник „Градски глас“ | Датум: <span id="date-text" style="cursor:pointer; color:#a1866f;">15 Мај 2025</span>
+    </div>
+</header>
+
+<div class="help-box" onclick="toggleHint()" onmouseleave="hideHelpHint()">
+    <div class="avatar">
+        <img src="pictures/Novinarka.png" alt="Аватар" />
+    </div>
+    <div class="help-text">Кликни за помош 🔍</div>
+    <div id="helpHintBox"></div>
+</div>
+
+<article>
+    <p>Градската управа деновиве започна со изградба на нов парк во центарот на градот, со цел да се подобри квалитетот на воздухот и да се зголемат зелените површини. Паркот ќе се простира на површина од околу 10 хектари и ќе содржи повеќе од 5.000 засадени дрвја и растенија.</p>
+
+    <p>Според изјавата на градоначалникот, проектот е дел од долгорочната стратегија за подобрување на животната средина и намалување на аерозагадувањето, кое претставува сериозен проблем во последните години. Очекувањата се дека новиот парк ќе помогне во намалувањето на штетните честички во воздухот и ќе овозможи место за рекреација и одмор за граѓаните.</p>
+
+    <blockquote id="quote">
+        „Ова е еден од најголемите проекти за зеленило во нашиот град досега,“ изјави градоначалникот. „Сакаме да создадеме поздрав и поубав град за сите наши жители.“
+    </blockquote>
+
+    <p>Покрај парковите, градот планира и други иницијативи за зголемување на свеста за заштита на животната средина, како што се кампањи за рециклирање и едукација во училиштата.</p>
+
+    <figure>
+        <img src="pictures/pexels-myersmc16-919335%20(1).jpg" width="200px" height="120px" alt="Градоначалник во паркот" id="park-image" />
+        <figcaption>Местото каде што ќе се гради новиот парк.</figcaption>
+    </figure>
+
+    <button id="investigate-btn" type="button">Истражи статија</button>
+</article>
+
+<footer>
+    Извор: Градски глас
+</footer>
+
+<div id="modal">
+    <div id="modal-content">
+        <div id="modal-text"></div>
+        <div id="modal-buttons"></div>
+    </div>
+</div>
+
+<script>
+    function showModal(text, buttons=[]) {
+        const modal = document.getElementById('modal');
+        const modalText = document.getElementById('modal-text');
+        const modalButtons = document.getElementById('modal-buttons');
+
+        modalText.textContent = text;
+        modalButtons.innerHTML = '';
+
+        buttons.forEach(btn => {
+            const button = document.createElement('button');
+            button.textContent = btn.text;
+            button.className = 'modal-btn';
+            button.onclick = () => {
+                btn.action();
+            };
+            modalButtons.appendChild(button);
+        });
+
+        modal.style.display = 'block';
+    }
+    function closeModal() {
+        document.getElementById('modal').style.display = 'none';
+    }
+    document.getElementById('date-text').addEventListener('click', () => {
+        showModal('Датумот 15 Мај 2025 го означува денот на објавување на статијата.', [
+            {text: 'Затвори', action: closeModal}
+        ]);
+    });
+
+    document.getElementById('title').addEventListener('click', () => {
+        showModal('Овој наслов точно ја отсликува содржината на статијата и нема за цел да ја измами публиката.', [
+            {text: 'Затвори', action: closeModal}
+        ]);
+    });
+
+    document.getElementById('quote').addEventListener('click', () => {
+        showModal('Дали новиот парк ќе помогне во намалување на аерозагадувањето?', [
+            {
+                text: 'Да', action: () => {
+                    closeModal();
+                    showModal(
+                        'Добро размислуваш! Научните истражувања покажуваат дека зголемувањето на зелените површини како парковите помага за апсорпција на штетни честички и подобрување на квалитетот на воздухот. Ова е важен чекор кон почист и поздрав град. Но дали тоа ја потврдува вистинитоста на оваа статија? Истражувај!',
+                        [{ text: 'Затвори', action: closeModal }]
+                    );
+                }
+            },
+            {
+                text: 'Не', action: () => {
+                    closeModal();
+                    showModal(
+                        'Всушност, повеќе стручни студии и статија ја потврдуваат улогата на зеленилото во намалување на аерозагадувањето. Дрвјата и растенијата ја филтрираат атмосферата и апсорбираат штетни гасови, што е научно докажано. Затоа, новиот парк е навистина важен за нашиот град!',
+                        [{ text: 'Затвори', action: closeModal }]
+                    );
+                }
+            }
+        ]);
+    });
+
+
+    document.getElementById('park-image').addEventListener('click', () => {
+        showModal('Ова е местото каде ќе се гради новиот парк. Ќе биде зелена оаза за сите.', [
+            {text: 'Затвори', action: closeModal}
+        ]);
+    });
+
+    function investigate() {
+        showModal(
+            "Избери каде сакаш да истражуваш:\n" +
+            "1 - Проверка на факти и мислење\n" +
+            "2 - Весникот „Градски глас“\n" +
+            "3 - Авторот (новинарот)\n" +
+            "4 - Проверка на сликата\n" +
+            "5 - Градоначалничкото биро\n" +
+            "6 - Други весници\n" +
+            "7 - Вистинита или лажна?",
+            [
+                {
+                    text: '1', action: () => {
+                        closeModal();
+                        showModal(
+                            "„Статијата вели дека проектот ќе го подобри животот во градот.“ - Факт или мислење?",
+                            [{ text: 'Назад', action: investigate }]
+                        );
+                    }
+                },
+                {
+                    text: '2', action: () => {
+                        closeModal();
+                        showModal(
+                            "„Градски глас“ е локален весник со добар реноме.",
+                            [{ text: 'Назад', action: investigate }]
+                        );
+                    }
+                },
+                {
+                    text: '3', action: () => {
+                        closeModal();
+                        showModal(
+                            "Авторот е млад новинар кој почнал минатата година и нема многу публикации.",
+                            [{ text: 'Назад', action: investigate }]
+                        );
+                    }
+                },
+                {
+                    text: '4', action: () => {
+                        closeModal();
+                        showModal(
+                            "Сликата е стандардна од локален настан, но не може да се исклучи фотомонтажа без дополнителна анализа.",
+                            [{ text: 'Назад', action: investigate }]
+                        );
+                    }
+                },
+                {
+                    text: '5', action: () => {
+                        closeModal();
+                        showModal(
+                            "Препоставен во општината на својата официјална страница зборува за проектот, но не открива детали за буџетот.",
+                            [{ text: 'Назад', action: investigate }]
+                        );
+                    }
+                },
+                {
+                    text: '6', action: () => {
+                        closeModal();
+                        showModal(
+                            "2 други локални весници имаат објавено за оваа вест до сега.",
+                            [{ text: 'Назад', action: investigate }]
+                        );
+                    }
+                },
+                {
+                    text: '7', action: () => {
+                        finalAssessment();
+                    }
+                }
+            ]
+        );
+    }
+
+    function finalAssessment() {
+        showModal("Дали мислиш дека статијата е лажна?", [
+            {
+                text: 'Не', action: () => {
+                    sessionStorage.setItem('score', '11.11');
+                    closeModal();
+                    showModal(
+                        "Точно! Критичкото размислување е важно, но и верувањето во добри извори."
+                    );
+                    setTimeout(() => {
+                        window.location.href = 'Biblioteka.html';
+                    }, 1500);
+                }
+            },
+            {
+                text: 'Да', action: () => {
+                    sessionStorage.setItem('score', '0');
+                    closeModal();
+                    showModal(
+                        "Статија е вистинска!"
+                    );
+                    setTimeout(() => {
+                        window.location.href = 'Biblioteka.html';
+                    }, 1500);
+                }
+            },
+        ]);
+    }
+    function toggleHint() {
+        if (helpHintBox.classList.contains('visible')) {
+            hideHelpHint();
+        } else {
+            showHelpHint();
+        }
+    }
+    function showHelpHint() {
+        helpHintBox.textContent = 'Разгледај низ статијата и провери дали има дополнителни елементи кои може да ги кликнеш за да истражиш!';
+        helpHintBox.classList.add('visible');
+    }
+    function hideHelpHint() {
+        helpHintBox.classList.remove('visible');
+        helpHintBox.textContent = '';
+    }
+
+    document.getElementById('investigate-btn').addEventListener('click', investigate);
+    window.onclick = function(event) {
+        const modal = document.getElementById('modal');
+        if (event.target == modal) {
+            closeModal();
+        }
+    }
+</script>
+
+</body>
+</html>

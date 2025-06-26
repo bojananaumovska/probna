@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="mk">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Мапа</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            margin: 0;
+            font-family: 'Georgia', serif;
+            background: #121212;
+            color: #fff;
+            overflow: hidden;
+        }
+        #map-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            background: url("A9hh8eIgSQWDUDOtDEkiCw.webp") no-repeat center center;
+            background-size: cover;
+        }
+        .level-button {
+            position: absolute;
+            padding: 10px 18px;
+            background: linear-gradient(145deg, #8B5E3C, rgba(93, 58, 26, 0.84));
+            border: 2px solid #6B4C2B;
+            border-radius: 50px;
+            box-shadow:
+                    0 0 10px #7A5B33AA,
+                    inset 0 -3px 6px #3D2F1B;
+            font-weight: 900;
+            font-size: 10px;
+            color: #f5e1c0;
+            cursor: pointer;
+            text-transform: uppercase;
+            text-align: center;
+            user-select: none;
+            font-family: 'Georgia', serif;
+            transition: transform 0.2s ease, box-shadow 0.3s ease;
+            animation: fadeIn 0.8s ease;
+        }
+        .level-button:hover:not(.disabled) {
+            transform: scale(1.1);
+            box-shadow:
+                    0 0 20px #B4996ACC,
+                    inset 0 -5px 10px #8B6E3F;
+        }
+        .disabled {
+            pointer-events: none;
+            opacity: 0.5;
+            filter: grayscale(70%);
+            cursor: default;
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.7);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        #reset-button {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            padding: 8px 16px;
+            background-color: red;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 12px;
+            user-select: none;
+            z-index: 100;
+        }
+        #modal {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(75, 52, 32, 0.85);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+        #modal.hidden {
+            display: none;
+        }
+        #modal-content {
+            background: #4B3420;
+            padding: 25px 30px;
+            border-radius: 15px;
+            box-shadow: 0 0 30px #B4996A;
+            max-width: 420px;
+            width: 90%;
+            text-align: center;
+            color: #f5e1c0;
+            position: relative;
+            user-select: none;
+            overflow-y: auto;
+            max-height: 80vh;
+        }
+        #modal-close {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            background: transparent;
+            border: none;
+            color: #fff;
+            font-size: 28px;
+            cursor: pointer;
+            font-weight: bold;
+            line-height: 1;
+        }
+        h2 {
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-weight: 700;
+            font-size: 22px;
+            letter-spacing: 1px;
+        }
+        #gender-selection {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            margin-top: 15px;
+            margin-bottom: 15px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+        }
+        .gender-option {
+            background: linear-gradient(145deg, #7C5B36, #4F3819);
+            border-radius: 10px;
+            padding: 15px 10px 10px;
+            cursor: pointer;
+            width: 140px;
+            box-shadow:
+                    0 0 10px #3D2F1B,
+                    inset 0 -3px 6px #2E220F;
+            transition: transform 0.2s ease, box-shadow 0.3s ease;
+            outline: none;
+            color: #f5e1c0;
+            user-select: none;
+        }
+        .gender-option:hover,
+        .gender-option:focus {
+            box-shadow:
+                    0 0 20px #B4996A,
+                    0 0 15px #fff,
+                    inset 0 -5px 10px #836a49;
+            transform: scale(1.05);
+        }
+        .gender-option.selected {
+            border: 3px solid #B4996A;
+            box-shadow:
+                    0 0 25px #B4996A,
+                    0 0 15px #fff,
+                    inset 0 -5px 10px #8B6E3F;
+        }
+        .gender-option img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            user-select: none;
+            pointer-events: none;
+            background: none;
+        }
+        .gender-label {
+            font-size: 10px;
+            font-weight: 600;
+            user-select: none;
+        }
+        #start-button {
+            position: relative;
+            padding: 10px 18px;
+            background: linear-gradient(145deg, #8B5E3C, #5D3A1A);
+            border: 2px solid #6B4C2B;
+            border-radius: 50px;
+            box-shadow:
+                    0 0 10px #7A5B33AA,
+                    inset 0 -3px 6px #3D2F1B;
+            font-weight: 900;
+            font-size: 14px;
+            color: #f5e1c0;
+            cursor: pointer;
+            text-transform: uppercase;
+            text-align: center;
+            user-select: none;
+            font-family: 'Georgia', serif;
+            transition: transform 0.2s ease, box-shadow 0.3s ease;
+            margin: 0 auto;
+            display: block;
+            width: 160px;
+            outline: none;
+        }
+        #start-button:disabled {
+            background-color: #5D3A1A;
+            border-color: #4B3420;
+            cursor: not-allowed;
+            box-shadow: none;
+            color: #9e8b6b;
+        }
+        #start-button:hover:not(:disabled) {
+            transform: scale(1.1);
+            box-shadow:
+                    0 0 20px #B4996ACC,
+                    inset 0 -5px 10px #8B6E3F;
+            background-color: #A67849;
+        }
+    </style>
+</head>
+<body>
+
+<div id="map-container">
+    <button class="level-button" id="reset-button" style="position:absolute; bottom:20px; right:20px; padding:8px 16px; background-color:red; border:none; border-radius:8px; font-size:12px; user-select:none; cursor:pointer; z-index:100;">РЕСТАРТ</button>
+    <button id="level1" class="level-button" style="top: 60%; left: 10%;">Маркет</button>
+    <button id="level2" class="level-button disabled" style="top: 40%; left: 45%;">Галерија</button>
+    <button id="level3" class="level-button disabled" style="top: 20%; left: 71%;">Библиотека</button>
+</div>
+
+<div id="score-display" style="position: fixed; top: 10px; right: 10px; color: #f5e1c0; font-family: Georgia, serif; z-index: 1000;">
+    Score: <span id="score-value">0</span>
+</div>
+
+<div id="modal" class="hidden" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div id="modal-content">
+        <img id="modalpic" src="modalpic.PNG" alt="Модал слика" style="max-width: 100%; border-radius: 12px; margin-bottom: 15px;" />
+        <button id="modal-close" aria-label="Затвори">&times;</button>
+        <h2 style="font-size: 12px" id="modalTitle">Избери пол</h2>
+        <div id="gender-selection">
+            <div class="gender-option" data-gender="male" tabindex="0" role="button" aria-pressed="false">
+                <img src="male.png" width="50px" height="50px" alt="Машки" />
+                <div class="gender-label">Машки</div>
+            </div>
+            <div class="gender-option" data-gender="female" tabindex="0" role="button" aria-pressed="false">
+                <img src="female.png" width="50px" height="50px" alt="Женски" />
+                <div class="gender-label">Женски</div>
+            </div>
+        </div>
+        <button id="start-button" disabled>СТАРТ</button>
+    </div>
+</div>
+
+<script>
+    const levelButtons = document.querySelectorAll('.level-button');
+    const resetButton = document.getElementById('reset-button');
+    const modal = document.getElementById('modal');
+    const modalClose = document.getElementById('modal-close');
+    const startButton = document.getElementById('start-button');
+    const genderOptions = document.querySelectorAll('.gender-option');
+
+    function unlockLevel(id) {
+        const level = document.getElementById(id);
+        if (level && level.classList.contains('disabled')) {
+            level.classList.remove('disabled');
+        }
+    }
+
+    function loadUnlockedLevels() {
+        const unlocked = JSON.parse(sessionStorage.getItem('unlockedLevels')) || [];
+        if (unlocked.length === 0) {
+            unlockLevel('level1');
+            sessionStorage.setItem('unlockedLevels', JSON.stringify(['level1']));
+        } else {
+            unlocked.forEach(levelId => unlockLevel(levelId));
+        }
+    }
+
+    function saveLevelUnlock(levelId) {
+        const unlocked = JSON.parse(sessionStorage.getItem('unlockedLevels')) || [];
+        if (!unlocked.includes(levelId)) {
+            unlocked.push(levelId);
+            sessionStorage.setItem('unlockedLevels', JSON.stringify(unlocked));
+        }
+    }
+
+    function resetProgress() {
+        sessionStorage.clear();
+        sessionStorage.removeItem('modalShown');
+        location.reload();
+    }
+
+    function updateTotalScore() {
+        const marketScore = parseFloat(sessionStorage.getItem('finalScore')) || 0;
+        const galleryScore = parseFloat(sessionStorage.getItem('GalleryScore')) || 0;
+        const libraryScore = parseFloat(sessionStorage.getItem('libraryScore')) || 0;
+
+        const totalScore = marketScore + galleryScore + libraryScore;
+        const totalScoreFixed = Math.round(totalScore);
+
+        sessionStorage.setItem('totalScore', totalScoreFixed);
+        document.getElementById('score-value').textContent = `${totalScoreFixed} / 100`;
+    }
+
+
+    function checkModal() {
+        if (!sessionStorage.getItem('modalShown')) {
+            modal.classList.remove('hidden');
+            sessionStorage.setItem('modalShown', 'true');
+        } else {
+            modal.classList.add('hidden');
+        }
+    }
+    window.addEventListener('load', () => {
+        loadUnlockedLevels();
+        updateTotalScore();
+        checkModal();
+    });
+
+    levelButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            if (!button.classList.contains('disabled')) {
+                const currentLevel = button.id;
+                switch(currentLevel) {
+                    case 'level1':
+                        saveLevelUnlock('level1');
+                        saveLevelUnlock('level2');
+                        window.location.href = 'market.html';
+                        break;
+                    case 'level2':
+                        saveLevelUnlock('level2');
+                        saveLevelUnlock('level3');
+                        window.location.href = 'Galerija.html';
+                        break;
+                    case 'level3':
+                        saveLevelUnlock('level3');
+                        window.location.href = 'Biblioteka.html';
+                        break;
+                }
+            }
+        });
+    });
+
+    modalClose.addEventListener('click', () => {
+        modal.classList.add('hidden');
+    });
+
+    let selectedGender = null;
+    genderOptions.forEach(option => {
+        option.addEventListener('click', () => {
+            genderOptions.forEach(o => {
+                o.classList.remove('selected');
+                o.setAttribute('aria-pressed', 'false');
+            });
+            option.classList.add('selected');
+            option.setAttribute('aria-pressed', 'true');
+            selectedGender = option.getAttribute('data-gender');
+            startButton.disabled = false;
+        });
+        option.addEventListener('keydown', e => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                option.click();
+            }
+        });
+    });
+    startButton.addEventListener('click', () => {
+        if (selectedGender) {
+            sessionStorage.setItem('selectedGender', selectedGender);
+            modal.classList.add('hidden');
+            console.log('Избран пол:', selectedGender);
+        }
+    });
+    resetButton.addEventListener('click', resetProgress);
+</script>
+</body>
+</html>

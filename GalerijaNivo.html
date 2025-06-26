@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="mk">
+<head>
+  <base href="pictures/">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Учиме</title>
+  <style>
+    html, body {
+      margin: 0; padding: 0; height: 100%; width: 100%;
+      font-family: 'Georgia', serif;
+      background: url('pictures/gallery.webp') no-repeat center center fixed;
+      background-size: cover;
+      color: #fff;
+      overflow: hidden;
+    }
+    .score-container {
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: #fff;
+      text-shadow: 1px 1px 6px #000;
+      text-align: center;
+      padding: 10px 0;
+      user-select: none;
+    }
+    .container {
+      display: flex;
+      height: calc(100vh - 60px);
+      padding: 20px;
+      gap: 20px;
+      box-sizing: border-box;
+    }
+    .left-side {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      justify-content: flex-start;
+      align-items: flex-start;
+      position: relative;
+      height: 140%;
+      overflow-y: auto;
+    }
+    .left-side img {
+      width: 100%;
+      max-width: 280px;
+      max-height: 40vh;
+      object-fit: contain;
+      cursor: pointer;
+      border: 3px solid transparent;
+      transition: border-color 0.3s;
+      user-select: none;
+      position: relative;
+      z-index: 1;
+    }
+    .left-side img.dragover {
+      border-color: #735643;
+    }
+    .right-side {
+      width: 300px;
+      background-color: #4b2e0c;
+      border-radius: 10px;
+      padding: 15px;
+      box-sizing: border-box;
+      color: #5d4b3a;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      overflow-y: auto;
+      user-select: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .right-side.hidden {
+      opacity: 0;
+      pointer-events: none;
+      width: 0;
+      padding: 0;
+      margin: 0;
+      overflow: hidden;
+    }
+
+    .draggable-item {
+      background-color: #f5f0e6;
+      color: #4b2e0c;
+      padding: 8px 12px;
+      border-radius: 8px;
+      cursor: grab;
+      user-select: none;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+    }
+    .draggable-item:active {
+      cursor: grabbing;
+    }
+    .drop-text {
+      position: absolute;
+      background: rgba(245, 240, 230, 0.9);
+      color: #4b2e0c;
+      border-radius: 6px;
+      padding: 4px 8px;
+      cursor: grab;
+      user-select: none;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+      font-size: 0.9rem;
+      z-index: 10;
+      white-space: nowrap;
+    }
+    .drop-text:active {
+      cursor: grabbing;
+    }
+    .frame-wrapper {
+      position: relative;
+      width: 100%;
+      max-width: 280px;
+      margin-bottom: 10px;
+    }
+    .frame-wrapper img {
+      width: 100%;
+      max-height: 40vh;
+      object-fit: contain;
+      display: block;
+      border: 3px solid transparent;
+      transition: border-color 0.3s;
+      user-select: none;
+      position: relative;
+      z-index: 1;
+      cursor: pointer;
+    }
+    .frame-label {
+      position: absolute;
+      top: 5px;
+      left: 5px;
+      background-color: rgba(0, 0, 0, 0.6);
+      color: rgb(182, 149, 127);
+      padding: 3px 7px;
+      font-size: 0.85rem;
+      font-weight: bold;
+      border-radius: 5px;
+      user-select: none;
+      pointer-events: none;
+      z-index: 5;
+    }
+    #back-button {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+
+      padding: 10px 18px;
+      background: linear-gradient(145deg, #8B5E3C, #5D3A1A);
+      border: 2px solid #6B4C2B;
+      border-radius: 50px;
+      box-shadow:
+              0 0 10px #7A5B33AA,
+              inset 0 -3px 6px #3D2F1B;
+      font-weight: 900;
+      font-size: 14px;
+      color: #f5e1c0;
+      cursor: pointer;
+      text-transform: uppercase;
+      text-align: center;
+      user-select: none;
+      font-family: 'Georgia', serif;
+      transition: transform 0.2s ease, box-shadow 0.3s ease;
+      outline: none;
+      display: none;
+      z-index: 100;
+    }
+    #back-button:hover {
+      background-color: #a27c5a;
+      box-shadow:
+              0 0 15px #a27c5a,
+              inset 0 -3px 8px #6f5127;
+      transform: scale(1.05);
+    }
+    #back-button:active {
+      transform: scale(0.95);
+    }
+
+  </style>
+</head>
+<body>
+
+<div class="score-container">
+  Score: <span id="score-display">0</span>
+</div>
+
+<div class="container">
+  <div class="left-side" id="leftSide">
+    <div class="frame-wrapper">
+      <img src="pictures/wood-frame.PNG" alt="Вистински слики" id="frame1" />
+      <div class="frame-label">Вистински слики</div>
+    </div>
+    <div class="frame-wrapper">
+      <img src="pictures/wood-frame.PNG" alt="Генерирани од ВИ" id="frame2" />
+      <div class="frame-label">Генерирани од ВИ</div>
+    </div>
+  </div>
+  <div class="right-side" id="rightSide">
+    <div class="draggable-item" draggable="true" id="item7" data-description="Прекумерна симетрија">Прекумерна симетрија</div>
+    <div class="draggable-item" draggable="true" id="item1" data-description="Детали во позадина">Детали во позадина </div>
+    <div class="draggable-item" draggable="true" id="item3" data-description="Нестандардни пропорции">Нестандардни пропорции</div>
+    <div class="draggable-item" draggable="true" id="item4" data-description="Конзистентно осветлување и сенки">Конзистентно осветлување и сенки</div>
+    <div class="draggable-item" draggable="true" id="item5" data-description="Фокус и длабочина">Фокус и длабочина</div>
+    <div class="draggable-item" draggable="true" id="item6" data-description="Неправилно споени елементи<">Неправилно споени елементи</div>
+    <div class="draggable-item" draggable="true" id="item9" data-description="Динамичност и движење">Динамичност и движење</div>
+    <div class="draggable-item" draggable="true" id="item10" data-description="Неконсистентно осветлување">Неконсистентно осветлување</div>
+    <div class="draggable-item" draggable="true" id="item11" data-description="Природна текстура">Природна текстура</div>
+    <div class="draggable-item" draggable="true" id="item8" data-description="Повторување на текстури или детали">Повторување на текстури или детали</div>
+    <div class="draggable-item" draggable="true" id="item12" data-description="Замагленост">Замагленост</div>
+    <div class="draggable-item" draggable="true" id="item2" data-description="Точна човекова анатомија">Точна човекова анатомија </div>
+  </div>
+</div>
+
+<button id="back-button">Врати се назад</button>
+
+<script>
+  const scoreDisplay = document.getElementById('score-display');
+  let score = 0;
+  scoreDisplay.textContent = score + " / 12";
+
+  const draggables = document.querySelectorAll('.draggable-item');
+  const dropzones = document.querySelectorAll('.left-side img');
+
+  const rightSide = document.getElementById('rightSide');
+  const backButton = document.getElementById('back-button');
+
+  const correctPlacements = {
+    frame1: [
+      "Детали во позадина",
+      "Точна човекова анатомија",
+      "Конзистентно осветлување и сенки",
+      "Природна текстура",
+      "Динамичност и движење",
+      "Фокус и длабочина"
+    ],
+    frame2: [
+      "Замагленост",
+      "Прекумерна симетрија",
+      "Неконсистентно осветлување",
+      "Нестандардни пропорции",
+      "Повторување на текстури или детали",
+      "Неправилно споени елементи"
+    ]
+  };
+
+  draggables.forEach(item => {
+    item.addEventListener('dragstart', ev => {
+      ev.dataTransfer.setData('text/plain', ev.target.id);
+      ev.dataTransfer.effectAllowed = "move";
+    });
+  });
+
+  dropzones.forEach(zone => {
+    zone.addEventListener('dragover', ev => {
+      ev.preventDefault();
+      zone.classList.add('dragover');
+      ev.dataTransfer.dropEffect = "move";
+    });
+
+    zone.addEventListener('dragleave', ev => {
+      zone.classList.remove('dragover');
+    });
+
+    zone.addEventListener('drop', ev => {
+      ev.preventDefault();
+      zone.classList.remove('dragover');
+
+      const draggedId = ev.dataTransfer.getData('text/plain');
+      const draggedEl = document.getElementById(draggedId);
+
+      const elementText = draggedEl.textContent.trim();
+      const zoneId = zone.id;
+
+      if (!correctPlacements[zoneId] || !correctPlacements[zoneId].includes(elementText)) {
+        alert(`Грешно! "${elementText}" не припаѓа на оваа слика.`);
+        return;
+      }
+
+      const exists = [...document.querySelectorAll('.drop-text')].some(el =>
+              el.dataset.imageId === zoneId && el.textContent.trim() === elementText
+      );
+      if (exists) {
+        alert(`Веќе додадовте "${elementText}" за оваа слика.`);
+        return;
+      }
+      const dropText = document.createElement('div');
+      dropText.classList.add('drop-text');
+      dropText.textContent = elementText;
+      dropText.dataset.imageId = zoneId;
+      const zoneRect = zone.getBoundingClientRect();
+      const containerRect = document.getElementById('leftSide').getBoundingClientRect();
+      let posX = ev.clientX - containerRect.left;
+      let posY = ev.clientY - containerRect.top;
+      if(posX < zoneRect.left - containerRect.left) posX = zoneRect.left - containerRect.left;
+      if(posX > zoneRect.right - containerRect.left - dropText.offsetWidth) posX = zoneRect.right - containerRect.left - dropText.offsetWidth;
+      if(posY < zoneRect.top - containerRect.top) posY = zoneRect.top - containerRect.top;
+      if(posY > zoneRect.bottom - containerRect.top - dropText.offsetHeight) posY = zoneRect.bottom - containerRect.top - dropText.offsetHeight;
+      dropText.style.position = 'absolute';
+      dropText.style.left = posX + 'px';
+      dropText.style.top = posY + 'px';
+      document.getElementById('leftSide').appendChild(dropText);
+      score++;
+      scoreDisplay.textContent = score + " / 12";
+      if(score >= 12) {
+        document.querySelectorAll('.drop-text').forEach(el => el.remove());
+        document.getElementById('frame1').src = 'realpic.JPG';
+        document.getElementById('frame1').alt = 'Вистинска слика';
+        document.getElementById('frame2').src = 'aipic.JPG';
+        document.getElementById('frame2').alt = 'Слика генерирана од ВИ';
+        rightSide.classList.add('hidden');
+        backButton.style.display = 'block';
+      }
+    });
+  });
+  backButton.addEventListener('click', () => {
+    sessionStorage.setItem('scoreNivo1', score.toFixed(2));
+    window.location.href = 'Galerija.html';
+  });
+</script>
+</body>
+</html>

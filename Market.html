@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="mk">
+<head>
+    <base href="pictures/">
+    <meta charset="UTF-8" />
+    <title>Маркет</title>
+    <style>
+        body {
+            font-family: Georgia, serif;
+            background: url('pictures/pozadina.jpeg') no-repeat center center fixed;
+            background-size: cover;
+            text-align: center;
+            padding: 20px;
+            margin: 0;
+            min-height: 100vh;
+            color: #333;
+        }
+        #scaleWrapper {
+            transform: scale(0.5);
+            transform-origin: top left;
+            width: 200%;
+            height: 200%;
+            overflow: visible;
+            margin: 0 auto;
+        }
+        .character {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        .character img {
+            width: 150px;
+            border-radius: 50%;
+            border: 3px solid white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+        }
+        .character p {
+            margin-top: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+        .dropzone {
+            border: 2px dashed #888;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px;
+            background-color: rgba(255, 255, 255, 0.8);
+            min-height: 150px;
+            width: 40%;
+            display: inline-block;
+            vertical-align: top;
+        }
+        .term {
+            display: inline-block;
+            margin: 10px;
+            padding: 10px 15px;
+            background: #fdd835;
+            border-radius: 10px;
+            cursor: grab;
+            font-weight: bold;
+            user-select: none;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 8px;
+            margin-top: 10px;
+            cursor: pointer;
+            background: #4caf50;
+            color: white;
+            border: none;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        .baskets {
+            display: none;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 20px;
+        }
+        .basket {
+            border: 3px dashed #666;
+            border-radius: 20px;
+            width: 180px;
+            padding: 10px;
+            background: #e3f2fd;
+            cursor: pointer;
+            transition: background 0.3s;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+        }
+        .basket:hover {
+            background: #bbdefb;
+        }
+        .basket img {
+            width: 100px;
+        }
+        #productArea {
+            display: none;
+            padding: 20px;
+            background: #fff;
+            border: 2px solid #ff9800;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            margin: 20px auto;
+            width: 60%;
+            border-radius: 15px;
+            font-size: 18px;
+            color: #333;
+        }
+        #feedback, #hint, #score {
+            margin-top: 20px;
+            font-size: 18px;
+            color: #333;
+            display: none;
+        }
+        #hint button {
+            background: #2196f3;
+        }
+        #hint button:hover {
+            background: #1976d2;
+        }
+        #gameCharacters {
+            display: none;
+            justify-content: center;
+            gap: 60px;
+            margin-top: 20px;
+        }
+        #gameCharacters > .character {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 150px;
+        }
+        #dialogue {
+            margin-bottom: 30px;
+            display: none;
+        }
+        #passwordChallenge {
+            display: none;
+            margin-top: 30px;
+        }
+        #finalTotal {
+            margin-top: 30px;
+            font-size: 24px;
+            font-weight: bold;
+            color: #222;
+        }
+    </style>
+</head>
+<body>
+<div id="scaleWrapper">
+
+    <div class="character" id="introCharacter">
+        <div class="character">
+            <img id="playerAvatar" src="pictures/kupuvac.png" alt="Играч" />
+            <p>Играч</p>
+        </div>
+    </div>
+
+    <h2 id="introTitle">🚨 Вовед: Препознај безбедни и небезбедни термини</h2>
+    <p id="introText">Повлечи ги термините во соодветната категорија:</p>
+
+    <div id="dragDropSection">
+        <div class="dropzone" ondrop="drop(event)" ondragover="allowDrop(event)" id="safe">
+            <h3>✅ Безбедно</h3>
+        </div>
+
+        <div class="dropzone" ondrop="drop(event)" ondragover="allowDrop(event)" id="unsafe">
+            <h3>⚠️ Небезбедно</h3>
+        </div>
+    </div>
+
+    <div id="terms">
+        <span class="term" draggable="true" ondragstart="drag(event)" id="term1">HTTPS</span>
+        <span class="term" draggable="true" ondragstart="drag(event)" id="term2">123456</span>
+        <span class="term" draggable="true" ondragstart="drag(event)" id="term3">Фишинг</span>
+        <span class="term" draggable="true" ondragstart="drag(event)" id="term4">VPN</span>
+        <span class="term" draggable="true" ondragstart="drag(event)" id="term5">Тројански коњ</span>
+        <span class="term" draggable="true" ondragstart="drag(event)" id="term6">Двофакторска автентикација</span>
+        <span class="term" draggable="true" ondragstart="drag(event)" id="term7">SSL сертификат</span>
+        <span class="term" draggable="true" ondragstart="drag(event)" id="term8">Јавна Wi-Fi мрежа</span>
+        <span class="term" draggable="true" ondragstart="drag(event)" id="term9">Малвер</span>
+        <span class="term" draggable="true" ondragstart="drag(event)" id="term10">Фајервол</span>
+        <span class="term" draggable="true" ondragstart="drag(event)" id="term11">Слаба лозинка</span>
+        <span class="term" draggable="true" ondragstart="drag(event)" id="term12">Енкрипција</span>
+    </div>
+
+    <button id="proceedButton" onclick="proceedToGame()">➡ Продолжи кон следниот дел</button><div id="introScore"></div>
+    <div id="iS"></div>
+
+    <div id="dialogue">
+        <div style="display: flex; justify-content: space-around;">
+            <div style="width: 40%; text-align: left;">
+                <div style="background: #fff3cd; border: 1px solid #ffeeba; padding: 10px; border-radius: 15px;">
+                    👩‍💼 Продавачка: Здраво! Имам неколку изјави за тебе. Твојот предизвик е да ги ставиш во вистинската корпа – <strong>ФАКТ</strong> или <strong>МИСЛЕЊЕ</strong>!
+                </div>
+            </div>
+            <div style="width: 40%; text-align: right;">
+                <div style="background: #d1ecf1; border: 1px solid #bee5eb; padding: 10px; border-radius: 15px;">
+                    🧑 Играч: Звучи интересно! Ајде да видиме дали ќе препознаам што е вистина, а што мислење.
+                </div>
+            </div>
+        </div>
+        <button onclick="startGame()">🚀 Започни</button>
+    </div>
+
+    <div id="gameCharacters">
+        <div class="character">
+            <img src="pictures/prodavac.png" alt="Продавачка" />
+            <p>Продавачка</p>
+        </div>
+        <div class="character">
+            <img id="pA" src="pictures/kupuvac.png" alt="Играч" />
+            <p>Играч</p>
+        </div>
+    </div>
+
+    <div id="productArea"></div>
+
+    <div class="baskets">
+        <div class="basket" onclick="dropProduct('fact')">
+            <img src="pictures/Red_Shopping_Basket_PNG_Clip_Art.png" alt="Факт" />
+            <p>ФАКТ</p>
+        </div>
+        <div class="basket" onclick="dropProduct('opinion')">
+            <img src="pictures/Red_Shopping_Basket_PNG_Clip_Art.png" alt="Мислење" />
+            <p>МИСЛЕЊЕ</p>
+        </div>
+    </div>
+
+    <div id="feedback"></div>
+    <div id="hint">
+        <button onclick="getHint()">Барај помош (2)</button>
+    </div>
+    <div id="score">Резултат: 0 / 33.33</div>
+
+    <div id="passwordChallenge">
+        <h3>🔐 Избери ја најсилната лозинка:</h3>
+        <div style="display: flex; justify-content: center; gap: 20px; flex-wrap: wrap;">
+            <button onClick="checkPassword('123456')">123456</button>
+            <button onClick="checkPassword('iloveyou')">iloveyou</button>
+            <button onClick="checkPassword('Tr0ub4dor&3')">Tr0ub4dor&3</button>
+            <button onClick="checkPassword('qwerty')">qwerty</button>
+            <button onClick="checkPassword('S3cur3P@ss!')">S3cur3P@ss!</button>
+            <button onClick="checkPassword('LetMeIn!2025')">LetMeIn!2025</button>
+            <button onClick="checkPassword('CorrectHorseBatteryStaple')">CorrectHorseBatteryStaple</button>
+            <button onClick="checkPassword('notSosecure')">notSosecure</button>
+        </div>
+        <div id="finalFeedback" style="margin-top: 20px; font-weight: bold;"></div>
+    </div>
+
+</div>
+
+<script>
+    const gender = sessionStorage.getItem('selectedGender');
+    const avatarImg = document.getElementById('playerAvatar');
+    let avatarImg2 = document.getElementById('pA');
+    if (gender === 'male') {
+        avatarImg2 = 'male.png';
+        avatarImg.src = 'male.png';
+    } else if (gender === 'female') {
+        avatarImg.src = 'female.png';
+        avatarImg2.src = 'female.png';
+    } else {
+        avatarImg.src = 'sliki/kupuvac.png';
+        avatarImg2.src = 'sliki/kupuvac.png';
+    }
+
+    const correctCategories = {
+        term1: "safe",   // HTTPS
+        term2: "unsafe", // 123456
+        term3: "unsafe", // Фишинг
+        term4: "safe",   // VPN
+        term5: "unsafe", // Тројански коњ
+        term6: "safe",   // Двофакторска автентикација
+        term7: "safe",   // SSL сертификат
+        term8: "unsafe", // Јавна Wi-Fi мрежа
+        term9: "unsafe", // Малвер
+        term10: "safe",  // Фајервол
+        term11: "unsafe",// Слаба лозинка
+        term12: "safe"   // Енкрипција
+    };
+
+    let introScore = 0;
+    let draggedTerms = new Set();
+
+    function allowDrop(ev) {
+        ev.preventDefault();
+    }
+
+    function drag(ev) {
+        ev.dataTransfer.setData("text", ev.target.id);
+    }
+
+    function drop(ev) {
+        ev.preventDefault();
+        const data = ev.dataTransfer.getData("text");
+        const draggedElement = document.getElementById(data);
+        const dropZone = ev.target.closest('.dropzone');
+        const correctZone = correctCategories[data];
+
+        if (!dropZone || draggedTerms.has(data)) return;
+
+        dropZone.appendChild(draggedElement);
+        draggedTerms.add(data);
+
+        if (correctZone === dropZone.id) {
+            introScore += 2.7775;
+        } else {
+            introScore -= 1;
+            if (introScore < 0) introScore = 0;
+        }
+
+        document.getElementById("iS").innerText = `Резултат: ${introScore.toFixed(2)} / 33.33`;
+
+    }
+
+    function proceedToGame() {
+        document.getElementById('introCharacter').style.display = 'none';
+        document.getElementById('introTitle').style.display = 'none';
+        document.getElementById('introText').style.display = 'none';
+        document.getElementById('dragDropSection').style.display = 'none';
+        document.getElementById('terms').style.display = 'none';
+        document.getElementById('proceedButton').style.display = 'none';
+        document.getElementById('introScore').style.display = 'none';
+
+        sessionStorage.setItem('introScore', introScore.toFixed(2));
+
+        document.getElementById('dialogue').style.display = 'block';
+        document.getElementById('gameCharacters').style.display = 'flex';
+    }
+
+    let products = [
+        { text: "Фишинг е техника која се користи за измама преку е-пошта.", type: "fact", hint: "Се користи во сајбер напади." },
+        { text: "Најдобриот антивирус е тој што го користам јас.", type: "opinion", hint: "Субјективен став." },
+        { text: "HTTPS е побезбеден од HTTP бидејќи користи енкрипција.", type: "fact", hint: "Технички факт." },
+        { text: "Линукс е најдобар оперативен систем за секој.", type: "opinion", hint: "Зависи од потребите." },
+        { text: "Јака лозинка содржи букви, бројки и специјални знаци.", type: "fact", hint: "Најдобра пракса." },
+        { text: "Темната тема на апликацијата изгледа најдобро.", type: "opinion", hint: "Зависи од личен вкус." },
+        { text: "Софтверските ажурирања често вклучуваат безбедносни поправки.", type: "fact", hint: "Обично се решаваат безбедносни проблеми." },
+        { text: "Windows Defender не е доволно добар за заштита.", type: "opinion", hint: "Став, не факт." },
+        { text: "Двофакторската автентикација ја зголемува безбедноста.", type: "fact", hint: "Позната сајбер безбедносна мерка." },
+        { text: "iPhone е посигурен од Android.", type: "opinion", hint: "Дискутабилна тема." },
+        { text: "Јавната Wi-Fi мрежа може да биде ризична за користење.", type: "fact", hint: "Постои ризик од пресретнување на податоци." }
+    ];
+
+    let current = 0;
+    let score = 0;
+    let hintsLeft = 2;
+
+    function startGame() {
+        score = 0;
+        current = 0;
+        hintsLeft = 2;
+
+        sessionStorage.setItem('factOpinionScore', '0');
+
+        document.getElementById('dialogue').style.display = 'none';
+        document.getElementById('gameCharacters').style.display = 'flex';
+        document.getElementById('productArea').style.display = 'block';
+        document.querySelector('.baskets').style.display = 'flex';
+        document.getElementById('feedback').style.display = 'block';
+        document.getElementById('hint').style.display = 'block';
+        document.getElementById('score').style.display = 'block';
+        document.getElementById('hint').querySelector('button').innerText = `Барај помош (${hintsLeft})`;
+
+        document.getElementById('iS').style.display = 'none';
+
+        showProduct();
+    }
+
+    function showProduct() {
+        if (current >= products.length) {
+            document.getElementById('productArea').innerHTML = "<strong>🎉 Го заврши вториот дел од играта!</strong>";
+            document.querySelector('.baskets').style.display = 'none';
+            document.getElementById('hint').style.display = 'none';
+            setTimeout(showPasswordChallenge, 2000);
+            return;
+        }
+        document.getElementById('productArea').innerText = products[current].text;
+        document.getElementById('feedback').innerText = "";
+    }
+
+    function dropProduct(choice) {
+        let p = products[current];
+        let correct = (p.type === choice);
+        if (correct) {
+            score += 33.33 / products.length;
+            document.getElementById('feedback').innerText = "✅ Точно! " + explain(p);
+        } else {
+            document.getElementById('feedback').innerText = "❌ Неточно! " + explain(p);
+        }
+        current++;
+        document.getElementById('score').innerText = `Резултат: ${score.toFixed(2)} / 33.33`;
+        sessionStorage.setItem('factOpinionScore', score.toFixed(2));
+
+        setTimeout(showProduct, 1800);
+    }
+
+    function showPasswordChallenge() {
+        document.getElementById('passwordChallenge').style.display = 'block';
+    }
+
+
+    function explain(product) {
+        return product.hint;
+    }
+
+    function getHint() {
+        if (hintsLeft <= 0) {
+            alert("Немаш повеќе помош!");
+            return;
+        }
+        alert("Помош: " + products[current].hint);
+        hintsLeft--;
+        document.getElementById('hint').querySelector('button').innerText = `Барај помош (${hintsLeft})`;
+    }
+
+    const strongPasswords = new Set([
+        'Tr0ub4dor&3',
+        'S3cur3P@ss!',
+        'LetMeIn!2025',
+        'CorrectHorseBatteryStaple'
+    ]);
+
+    let passwordScore = 0;
+
+    function checkPassword(pwd) {
+        if (strongPasswords.has(pwd)) {
+            passwordScore = 33.33;
+            document.getElementById('finalFeedback').innerHTML = `<span style="color:green;">✅ Сигурна лозинка!</span>`;
+        } else {
+            passwordScore = 0;
+            document.getElementById('finalFeedback').innerHTML = `<span style="color:red;">❌ Слаба лозинка, пробај повторно.</span>`;
+        }
+
+        // Чувај во sessionStorage
+        sessionStorage.setItem('passwordScore', passwordScore);
+
+        showFinalTotal();
+    }
+
+    function showFinalTotal() {
+        const dragDropScore = parseFloat(sessionStorage.getItem('introScore')) || 0;
+        const factOpinionScore = parseFloat(sessionStorage.getItem('factOpinionScore')) || 0;
+        const passwordScore = parseFloat(sessionStorage.getItem('passwordScore')) || 0;
+
+        const totalRaw = dragDropScore + factOpinionScore + passwordScore;
+        const finalScore = totalRaw * 0.3333;
+
+        let finalDiv = document.getElementById('finalTotal');
+        if (!finalDiv) {
+            finalDiv = document.createElement('div');
+            finalDiv.id = 'finalTotal';
+            document.body.appendChild(finalDiv);
+        }
+
+        finalDiv.innerHTML = `<h2>🎯 Вкупен резултат: ${finalScore.toFixed(2)} / 33.33</h2>`;
+
+        sessionStorage.setItem('finalScore', finalScore.toFixed(2));
+        setTimeout(() => {
+            window.location.href = "index.html";
+        }, 3000);
+    }
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <base href="pictures/">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Библиотека</title>
+    <style>
+        body, html {
+            margin: 0; padding: 0;
+            font-family: 'Georgia', serif;
+            height: 100%;
+            overflow-x: hidden;
+        }
+        .library-container {
+            position: relative;
+            background: url('pictures/pexels-repuding-12064.jpg') no-repeat center center/cover;
+            height: 100vh;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .overlay {
+            position: absolute;
+            inset: 0;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 0;
+        }
+        .title {
+            position: relative;
+            z-index: 1;
+            font-size: 20px;
+            color: #fff;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 8px #000;
+        }
+        .cards-container {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            gap: 15px;
+            flex-wrap: nowrap;
+            justify-content: center;
+        }
+        .card {
+            width: 180px;
+            background: linear-gradient(to bottom, #8b5e3c, #5c3b1e);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.4);
+            position: relative;
+            transition: transform 0.3s;
+            cursor: pointer;
+        }
+        .card:hover {
+            transform: scale(1.05);
+        }
+        .article-img {
+            width: 100%;
+            height: 110px;
+            object-fit: cover;
+            display: block;
+        }
+        .lock-icon {
+            width: 32px;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 2;
+        }
+        .card-content {
+            padding: 15px;
+            color: #fff;
+            font-size: 13px;
+        }
+        #modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background-color: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(3px);
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+        #modal-content {
+            background: #5c3317;
+            border-radius: 12px;
+            padding: 20px;
+            width: 320px;
+            max-width: 90vw;
+
+            max-height: 70vh;
+            overflow-y: auto;
+
+            box-shadow: 0 0 20px #7a5b33cc;
+            color: #fff;
+            font-family: 'Georgia', serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            position: relative;
+            text-align: center;
+        }
+
+        #modal img.modal-image {
+            width: 100%;
+            border-radius: 12px;
+            object-fit: contain;
+        }
+        #modal-close {
+            position: absolute;
+            top: 12px;
+            right: 15px;
+            font-size: 28px;
+            color: #b4996a;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            user-select: none;
+            font-weight: 900;
+            transition: color 0.3s ease;
+        }
+        #modal-close:hover {
+            color: #f0e6c8;
+        }
+        .dialogue {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            align-items: center;
+        }
+        .avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            overflow: hidden;
+            box-shadow: 0 0 6px rgba(0,0,0,0.4);
+            flex-shrink: 0;
+            background-color: #f3e9dc;
+        }
+        .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .speech-bubble {
+            background: #735643;
+            border-radius: 12px;
+            padding: 10px 15px;
+            font-size: 14px;
+            box-shadow: 0 0 8px rgba(207, 161, 120, 0.67);
+            max-width: 180px;
+            color: #fff;
+            font-family: 'Georgia', serif;
+        }
+        .main-button {
+            padding: 10px 20px;
+            background: linear-gradient(145deg, #8b5e3c, #5d3a1a);
+            border: 3px solid #6b4c2b;
+            border-radius: 50px;
+            box-shadow:
+                    0 0 12px #7a5b33cc,
+                    inset 0 -3px 6px #3d2f1b;
+            font-weight: 900;
+            font-size: 14px;
+            color: #f5e1c0;
+            cursor: pointer;
+            text-transform: uppercase;
+            user-select: none;
+            font-family: 'Georgia', serif;
+            transition: transform 0.2s ease, box-shadow 0.3s ease;
+        }
+        .main-button:hover:not(:disabled) {
+            transform: scale(1.1);
+            box-shadow:
+                    0 0 20px #b4996acc,
+                    inset 0 -5px 10px #8b6e3f;
+        }
+        .main-button:disabled {
+            opacity: 0.5;
+            cursor: default;
+            box-shadow: none;
+        }
+        body.modal-open {
+            overflow: hidden;
+        }
+        .score-container {
+            position: relative;
+            z-index: 1;
+            margin-top: 13px;
+            font-size: 14px;
+            font-weight: 700;
+            color: #fff;
+            text-shadow: 1px 1px 4px #000;
+            font-family: 'Georgia', serif;
+            text-align: center;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+<div id="modal">
+    <div id="modal-content">
+        <button id="modal-close" aria-label="Close modal">&times;</button>
+        <img src="pictures/modalbiblioteka.PNG" alt="Modal Image" class="modal-image" />
+        <div class="dialogue">
+            <div class="avatar">
+                <img src="pictures/Novinarka.png" alt="Новинарка" />
+            </div>
+            <div style="font-size: 10px" class="speech-bubble">👋 Здраво! Добредојде во библиотеката. Јас сум библиотекарка и тука сум да ти помогнам.</div>
+        </div>
+        <div class="dialogue" style="justify-content: flex-end; margin-top: 10px;">
+            <div style="font-size: 10px" class="speech-bubble" id="user-bubble" style="background:#6b4c2a;">👋 Здраво и тебе!</div>
+            <div class="avatar" id="avatar-container"></div>
+        </div>
+        <button id="start-button" class="main-button" disabled>СТАРТ</button>
+    </div>
+</div>
+
+<div class="library-container">
+    <div class="overlay"></div>
+    <h3 class="title">Библиотека</h3>
+    <div class="cards-container">
+        <div class="card locked" onclick="window.location.href='StatijaPrva.html';">
+            <img src="pictures/article1.jpg" alt="Article 1" class="article-img" />
+            <img src="pictures/lock.png" alt="Locked" class="lock-icon" />
+            <div class="card-content">
+                <p>"Новиот парк во центарот на градот ќе го подобри квалитетот на воздухот и ќе ја зголеми зелената површина" - Градски глас</p>
+            </div>
+        </div>
+        <div class="card locked" onclick="window.location.href='StatijaVtora.html';">
+            <img src="pictures/article2.webp" alt="Article 2" class="article-img" />
+            <img src="pictures/lock.png" alt="Locked" class="lock-icon" />
+            <div class="card-content">
+                <p>Биолуминисцентни дрвја засадени во Скопје, револуција во урбаното осветлување? - Урбан весник</p>
+            </div>
+        </div>
+        <div class="card locked" onclick="window.location.href='StatijaTreta.html';">
+            <img src="pictures/Screenshot%202025-06-07%20165619.png" alt="Article 3" class="article-img" />
+            <img src="pictures/lock.png" alt="Locked" class="lock-icon" />
+            <div class="card-content">
+                <p>Истражување тврди: Сончогледовото масло може да предизвика зависност слична на шеќер - Натура МК</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="score-container">
+        <p>Score: <span id="score-display">0</span> / 36.67</p>
+    </div>
+</div>
+
+<script>
+    const gender = sessionStorage.getItem('selectedGender');
+    const avatarContainer = document.getElementById('avatar-container');
+    if (gender === 'female') {
+        avatarContainer.innerHTML = '<img src="pictures/female.png" alt="Женски аватар" />';
+    } else if (gender === 'male') {
+        avatarContainer.innerHTML = '<img src="pictures/male.png" alt="Машки аватар" />';
+    } else {
+        avatarContainer.innerHTML = '<img src="default.png" alt="Стандардна слика" />';
+    }
+    const score = parseFloat(sessionStorage.getItem('score')) || 0;
+    const score1 = parseFloat(sessionStorage.getItem('scorevtora')) || 0;
+    const score2 = parseFloat(sessionStorage.getItem('scoretreta')) || 0;
+    const totalScore = score + score1 + score2;
+
+    document.getElementById('score-display').textContent = totalScore.toFixed(2);
+
+    const modal = document.getElementById('modal');
+    const modalClose = document.getElementById('modal-close');
+    const startButton = document.getElementById('start-button');
+
+    function openModal() {
+        modal.style.display = 'flex';
+        document.body.classList.add('modal-open');
+    }
+    function closeModal() {
+        modal.style.display = 'none';
+        document.body.classList.remove('modal-open');
+    }
+    window.addEventListener('load', () => {
+        const referrer = document.referrer;
+        if (referrer.includes('index.html')) {
+            openModal();
+        }
+        if (referrer.includes('StatijaTreta.html')) {
+            setTimeout(() => {
+                sessionStorage.setItem('gameEnded', 'true');
+                sessionStorage.setItem('libraryScore', totalScore.toFixed(2));
+                window.location.href = 'index.html';
+            }, 2500);
+        }
+    });
+    modalClose.onclick = closeModal;
+    setTimeout(() => {
+        startButton.disabled = false;
+    }, 1500);
+    startButton.onclick = () => {
+        closeModal();
+    };
+</script>
+
+</body>
+</html>
